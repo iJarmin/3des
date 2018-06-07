@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--<script  type="text/javascript" src="./node_modules/jquery/dist/jquery.js"  charset="UTF-8"></script>-->
+    <script type="text/javascript"  src="./js/crypto-js.js" charset="UTF-8"></script>
+    <script type="text/javascript"  src="./js/jsencrypt.js" charset="UTF-8"></script>
+    <title>3DES加密解密与Base64编码解码处理数据</title>
+    <style type="text/css">
+        body {
+            margin: 100px;
+        }
+        p, button {
+            font-size: 30px;
+        }
+        .btn2 {
+            margin-left: 100px;
+        }
+        textarea{
+            resize: none;
+            width: 300px;
+        }
+    </style>
+    <script type="text/javascript">
+        //秘钥key
+        var key = "12345677654321";
+        //key不足24位自动以0(最小位数是0)补齐,如果多余24位,则截取前24位,后面多余则舍弃掉
+        var base64 = CryptoJS.enc.Utf8.parse(key)
+        //加密使用的是3DES中的ECB,解密对应的使用ECB
+        function encrypt() {
+            var text = document.getElementById('content').value+'';
+            var encrypt = CryptoJS.TripleDES.encrypt(text, base64, {
+                    iv: CryptoJS.enc.Utf8.parse('0123456789'),//iv偏移量
+                    mode: CryptoJS.mode.CBC,  //CBC模式
+                    // mode: CryptoJS.mode.ECB,  //ECB模式
+                    padding: CryptoJS.pad.Pkcs7//padding处理
+                }
+            );
+            var encryptData = encrypt.toString();//加密完成后，转换成字符串
+            document.getElementById("encrypt").innerText=encryptData;
+        }
+        //解密
+        function decrypt() {
+            var text = document.getElementById("encrypt").innerText;
+            var decrypt = CryptoJS.TripleDES.decrypt(text, base64, {
+                    iv: CryptoJS.enc.Utf8.parse('0123456789'),
+                    mode: CryptoJS.mode.CBC,
+                    // mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+            //解析数据后转为UTF-8
+            var parseData = decrypt.toString(CryptoJS.enc.Utf8);
+            document.getElementById("decrypt").innerText=parseData;
+        }
+    </script>
+
+</head>
+<body>
+<h1>原文:</h1><textarea id="content"></textarea>
+<h1 style="color: red;">加密编码后:</h1><p id="encrypt"></p>
+<h1 style="color: green">解码解密后:</h1><p id="decrypt"></p>
+<button onclick="encrypt()">加密</button><button class="btn2" onclick="decrypt()">解密</button>
+</body>
+</html>
